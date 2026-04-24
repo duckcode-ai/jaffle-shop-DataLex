@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: customer_order_summary
+    description: Example dbt YAML generated from the logical DataLex model before promotion into the dbt repo.
+    columns:
+      - name: customer_id
+        description: Customer primary key.
+        data_type: integer
+        tests: [not_null, unique]
+      - name: customer_name
+        description: Customer display name.
+        data_type: varchar
+      - name: customer_type
+        description: Customer lifecycle segment.
+        data_type: varchar
+      - name: count_lifetime_orders
+        description: Count of customer orders.
+        data_type: integer
+      - name: lifetime_spend
+        description: Gross customer lifetime spend.
+        data_type: decimal(12,2)
+      - name: latest_ordered_at
+        description: Latest order timestamp for the customer.
+        data_type: timestamp
+      - name: modeled_order_total
+        description: Recomputed customer total from orders.
+        data_type: decimal(12,2)

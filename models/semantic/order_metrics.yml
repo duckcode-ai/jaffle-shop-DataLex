@@ -1,0 +1,63 @@
+semantic_models:
+  - name: orders
+    description: Semantic order fact model for DataLex metric modeling.
+    model: ref('fct_orders')
+    defaults:
+      agg_time_dimension: ordered_at
+    entities:
+      - name: order
+        type: primary
+        expr: order_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+    dimensions:
+      - name: ordered_at
+        type: time
+        type_params:
+          time_granularity: day
+      - name: is_food_order
+        type: categorical
+      - name: is_drink_order
+        type: categorical
+    measures:
+      - name: order_total
+        description: Gross order amount.
+        agg: sum
+      - name: order_count
+        expr: 1
+        agg: sum
+      - name: order_cost
+        description: Cost to fulfill the order.
+        agg: sum
+
+metrics:
+  - name: order_total
+    label: Order Total
+    description: Gross revenue from orders.
+    type: simple
+    type_params:
+      measure: order_total
+  - name: order_count
+    label: Order Count
+    description: Count of orders.
+    type: simple
+    type_params:
+      measure: order_count
+  - name: order_cost
+    label: Order Cost
+    description: Cost required to fulfill orders.
+    type: simple
+    type_params:
+      measure: order_cost
+  - name: order_margin
+    label: Order Margin
+    description: Order revenue minus supply cost.
+    type: derived
+    type_params:
+      expr: revenue - cost
+      metrics:
+        - name: order_total
+          alias: revenue
+        - name: order_cost
+          alias: cost

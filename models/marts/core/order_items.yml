@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: order_items
+    description: Order line item mart, one row per purchased product.
+    columns:
+      - name: order_item_id
+        description: Primary key for the order line item.
+        data_type: integer
+        tests: [not_null, unique]
+      - name: order_id
+        description: Order containing this line item.
+        data_type: integer
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: product_id
+        description: Product SKU purchased.
+        data_type: varchar
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: product_name
+        description: Product display name.
+        data_type: varchar
+      - name: product_type
+        description: Product category.
+        data_type: varchar
+      - name: product_price
+        description: Item revenue before tax.
+        data_type: decimal(12,2)
+      - name: supply_cost
+        description: Fulfillment supply cost allocated to the item.
+        data_type: decimal(12,2)
+      - name: is_food_item
+        description: True when the line item is food.
+        data_type: boolean
+      - name: is_drink_item
+        description: True when the line item is a drink.
+        data_type: boolean
+      - name: ordered_at
+        description: Timestamp inherited from the order header.
+        data_type: timestamp

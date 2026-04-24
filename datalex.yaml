@@ -1,0 +1,14 @@
+kind: project
+name: jaffle_shop_datalex
+version: "1"
+description: Clean jaffle-shop dbt DuckDB project with DataLex conceptual, logical, physical, and semantic modeling examples.
+dialects: [duckdb]
+default_dialect: duckdb
+models: DataLex/**/*.model.yaml
+relationships: DataLex/**/*.relationship.yaml
+data_types: DataLex/**/*.data_type.yaml
+semantic_models: DataLex/**/*.semantic.yaml
+diagrams: DataLex/**/*.diagram.yaml
+meta:
+  dbt_project: dbt_project.yml
+  local_warehouse: jaffle_shop.duckdb

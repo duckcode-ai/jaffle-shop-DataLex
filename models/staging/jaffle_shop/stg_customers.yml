@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Clean customer records, one row per customer.
+    columns:
+      - name: customer_id
+        description: Primary key for a customer.
+        data_type: integer
+        tests: [not_null, unique]
+      - name: customer_name
+        description: Customer display name.
+        data_type: varchar
+        tests: [not_null]

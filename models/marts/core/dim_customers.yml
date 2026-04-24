@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: Customer dimension table, one row per customer with lifecycle metrics.
+    columns:
+      - name: customer_id
+        description: Primary key for the customer.
+        data_type: integer
+        tests: [not_null, unique]
+      - name: customer_name
+        description: Customer display name.
+        data_type: varchar
+      - name: count_lifetime_orders
+        description: Total number of orders placed by the customer.
+        data_type: integer
+      - name: first_ordered_at
+        description: Timestamp of the customer's first order.
+        data_type: timestamp
+      - name: last_ordered_at
+        description: Timestamp of the customer's latest order.
+        data_type: timestamp
+      - name: lifetime_spend_pretax
+        description: Customer lifetime item spend before tax.
+        data_type: decimal(12,2)
+      - name: lifetime_spend
+        description: Customer lifetime gross spend including tax.
+        data_type: decimal(12,2)
+      - name: customer_type
+        description: Lifecycle segment derived from order history.
+        data_type: varchar
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['new', 'returning']

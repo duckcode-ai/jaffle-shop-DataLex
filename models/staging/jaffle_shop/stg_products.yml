@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: Clean product catalog, one row per sellable SKU.
+    columns:
+      - name: product_id
+        description: Primary key and business SKU for a product.
+        data_type: varchar
+        tests: [not_null, unique]
+      - name: product_name
+        description: Product display name.
+        data_type: varchar
+      - name: product_type
+        description: Product category.
+        data_type: varchar
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['jaffle', 'beverage']
+      - name: product_description
+        description: Customer-facing product description.
+        data_type: varchar
+      - name: product_price
+        description: Product list price in USD.
+        data_type: decimal(12,2)
+      - name: is_food_item
+        description: True when the product is a jaffle.
+        data_type: boolean
+      - name: is_drink_item
+        description: True when the product is a beverage.
+        data_type: boolean

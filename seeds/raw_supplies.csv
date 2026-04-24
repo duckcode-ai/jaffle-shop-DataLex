@@ -1,0 +1,8 @@
+id,sku,name,cost,perishable
+1,JAF-001,Bread,160,true
+2,JAF-001,Cheddar,220,true
+3,JAF-002,Bread,160,true
+4,JAF-002,Jalapeno Mix,180,true
+5,JAF-003,Egg,210,true
+6,BEV-001,Coffee Beans,130,false
+7,BEV-002,Can,60,false

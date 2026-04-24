@@ -1,0 +1,89 @@
+kind: diagram
+name: commerce_physical_duckdb
+title: Jaffle Shop Commerce Physical Model - DuckDB/dbt
+layer: physical
+domain: commerce
+dialect: duckdb
+entities:
+  - name: dim_customers
+    type: dimension
+    domain: commerce
+    description: "Customer dimension with order history and lifetime value. dbt YAML: models/marts/core/dim_customers.yml"
+    tags: [dbt, mart, dimension]
+    fields:
+      - { name: customer_id, type: integer, primary_key: true, nullable: false }
+      - { name: customer_name, type: varchar, nullable: false }
+      - { name: first_order_at, type: timestamp }
+      - { name: most_recent_order_at, type: timestamp }
+      - { name: number_of_orders, type: integer }
+      - { name: lifetime_value, type: double }
+    x: 80
+    y: 100
+    width: 360
+  - name: fct_orders
+    type: fact
+    domain: commerce
+    description: "Order fact table at one row per customer order. dbt YAML: models/marts/core/fct_orders.yml"
+    tags: [dbt, mart, fact]
+    fields:
+      - { name: order_id, type: integer, primary_key: true, nullable: false }
+      - { name: customer_id, type: integer, nullable: false, foreign_key: { entity: dim_customers, field: customer_id } }
+      - { name: ordered_at, type: timestamp, nullable: false }
+      - { name: order_total, type: double }
+      - { name: tax_paid, type: double }
+      - { name: order_cost, type: double }
+      - { name: order_margin, type: double }
+    x: 500
+    y: 100
+    width: 380
+  - name: order_items
+    type: bridge
+    domain: commerce
+    description: "Order line bridge that resolves orders to products. dbt YAML: models/marts/core/order_items.yml"
+    tags: [dbt, mart, bridge]
+    fields:
+      - { name: order_item_id, type: varchar, primary_key: true, nullable: false }
+      - { name: order_id, type: integer, nullable: false, foreign_key: { entity: fct_orders, field: order_id } }
+      - { name: product_id, type: varchar, nullable: false, foreign_key: { entity: stg_products, field: product_id } }
+      - { name: quantity, type: integer, nullable: false }
+      - { name: item_price, type: double }
+      - { name: supply_cost, type: double }
+    x: 500
+    y: 430
+    width: 380
+  - name: stg_products
+    type: table
+    domain: commerce
+    description: "Cleaned product staging model from the raw product seed. dbt YAML: models/staging/jaffle_shop/stg_products.yml"
+    tags: [dbt, staging]
+    fields:
+      - { name: product_id, type: varchar, primary_key: true, nullable: false }
+      - { name: product_name, type: varchar, nullable: false }
+      - { name: product_type, type: varchar }
+      - { name: product_price, type: double }
+    x: 930
+    y: 430
+    width: 360
+relationships:
+  - name: fct_orders_customer_fk
+    from: { entity: fct_orders, field: customer_id }
+    to: { entity: dim_customers, field: customer_id }
+    cardinality: many_to_one
+    optional: false
+    on_delete: restrict
+  - name: order_items_order_fk
+    from: { entity: order_items, field: order_id }
+    to: { entity: fct_orders, field: order_id }
+    cardinality: many_to_one
+    optional: false
+    on_delete: restrict
+  - name: order_items_product_fk
+    from: { entity: order_items, field: product_id }
+    to: { entity: stg_products, field: product_id }
+    cardinality: many_to_one
+    optional: false
+    on_delete: restrict
+dbt:
+  source: connected_repo
+  generated_sql:
+    - DataLex/commerce/Generated/dbt/customer_order_summary.sql

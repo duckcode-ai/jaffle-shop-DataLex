@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Clean order headers, one row per order.
+    columns:
+      - name: order_id
+        description: Primary key for an order.
+        data_type: integer
+        tests: [not_null, unique]
+      - name: location_id
+        description: Store location where the order was placed.
+        data_type: integer
+        tests: [not_null]
+      - name: customer_id
+        description: Customer who placed the order.
+        data_type: integer
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: order_total
+        description: Order total in USD, including tax.
+        data_type: decimal(12,2)
+      - name: tax_paid
+        description: Tax paid in USD.
+        data_type: decimal(12,2)
+      - name: ordered_at
+        description: Timestamp when the order was placed.
+        data_type: timestamp

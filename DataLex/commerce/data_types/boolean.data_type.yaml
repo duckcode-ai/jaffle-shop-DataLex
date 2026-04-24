@@ -1,0 +1,8 @@
+kind: data_type
+name: boolean
+description: True or false flag.
+base: boolean
+precision: any
+physical:
+  duckdb:
+    type: boolean

@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: stg_supplies
+    description: Clean supply cost components, one row per product supply input.
+    columns:
+      - name: supply_uuid
+        description: Surrogate key for a product supply component.
+        data_type: varchar
+        tests: [not_null, unique]
+      - name: supply_id
+        description: Source supply identifier.
+        data_type: integer
+      - name: product_id
+        description: Product SKU that consumes this supply.
+        data_type: varchar
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: supply_name
+        description: Supply component name.
+        data_type: varchar
+      - name: supply_cost
+        description: Supply cost in USD.
+        data_type: decimal(12,2)
+      - name: is_perishable_supply
+        description: True when the supply has perishability handling.
+        data_type: boolean

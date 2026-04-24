@@ -1,0 +1,8 @@
+kind: data_type
+name: string
+description: Business text.
+base: string
+precision: any
+physical:
+  duckdb:
+    type: varchar

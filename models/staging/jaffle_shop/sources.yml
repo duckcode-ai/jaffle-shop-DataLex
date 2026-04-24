@@ -1,0 +1,23 @@
+version: 2
+
+sources:
+  - name: jaffle_shop
+    database: jaffle_shop
+    schema: raw
+    description: Raw source extracts for the local DuckDB jaffle shop demo.
+    tables:
+      - name: customers
+        identifier: raw_customers
+        description: Customer master records from the ordering system.
+      - name: orders
+        identifier: raw_orders
+        description: Header-level orders placed by customers.
+      - name: items
+        identifier: raw_items
+        description: Line items connecting orders to product SKUs.
+      - name: products
+        identifier: raw_products
+        description: Product catalog for food and beverage items.
+      - name: supplies
+        identifier: raw_supplies
+        description: Supply cost components used to fulfill products.

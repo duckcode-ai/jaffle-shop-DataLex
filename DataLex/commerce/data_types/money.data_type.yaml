@@ -1,0 +1,8 @@
+kind: data_type
+name: money
+description: Currency amount in USD.
+base: number
+precision: exact
+physical:
+  duckdb:
+    type: decimal(12,2)

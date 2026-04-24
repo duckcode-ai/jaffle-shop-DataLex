@@ -1,0 +1,8 @@
+kind: data_type
+name: timestamp
+description: Point-in-time event timestamp.
+base: timestamp
+precision: any
+physical:
+  duckdb:
+    type: timestamp

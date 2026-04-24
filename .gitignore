@@ -1,0 +1,15 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+logs/
+target/
+dbt_packages/
+jaffle_shop.duckdb
+*.duckdb.wal
+.dm-projects.json
+.dm-connections.json
+.user.yml
+/core/
+/domains/
+/projects/

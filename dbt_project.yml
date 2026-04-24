@@ -1,0 +1,31 @@
+name: "jaffle_shop_datalex"
+version: "1.0.0"
+config-version: 2
+
+profile: "jaffle_shop_datalex"
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  jaffle_shop_datalex:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+    semantic:
+      +materialized: view
+
+seeds:
+  jaffle_shop_datalex:
+    +schema: raw
+    +quote_columns: false

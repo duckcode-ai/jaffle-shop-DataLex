@@ -1,0 +1,8 @@
+kind: data_type
+name: number
+description: Whole number identifier or count.
+base: number
+precision: any
+physical:
+  duckdb:
+    type: integer

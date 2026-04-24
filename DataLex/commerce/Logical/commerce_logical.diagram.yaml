@@ -1,0 +1,126 @@
+kind: diagram
+name: commerce_logical
+title: Jaffle Shop Commerce Logical Model
+layer: logical
+domain: commerce
+entities:
+  - name: Customer
+    type: logical_entity
+    domain: commerce
+    description: Customer business entity with lifecycle attributes.
+    fields:
+      - { name: customer_key, type: number, primary_key: true, nullable: false }
+      - { name: customer_name, type: string, nullable: false }
+      - { name: customer_type, type: string }
+    candidate_keys:
+      - [customer_key]
+    business_keys:
+      - [customer_name]
+    surrogate_key: customer_key
+    x: 80
+    y: 90
+    width: 330
+  - name: Sales Order
+    type: logical_entity
+    domain: commerce
+    description: Header-level order event placed by a customer.
+    fields:
+      - { name: order_key, type: number, primary_key: true, nullable: false }
+      - { name: customer_key, type: number, nullable: false, foreign_key: { entity: Customer, field: customer_key } }
+      - { name: location_key, type: number }
+      - { name: ordered_at, type: timestamp }
+      - { name: order_total, type: money }
+      - { name: tax_paid, type: money }
+    candidate_keys:
+      - [order_key]
+    x: 470
+    y: 90
+    width: 360
+  - name: Order Line
+    type: associative_entity
+    domain: commerce
+    description: Associative entity resolving the many-to-many relationship between orders and products.
+    fields:
+      - { name: order_line_key, type: number, primary_key: true, nullable: false }
+      - { name: order_key, type: number, nullable: false, foreign_key: { entity: Sales Order, field: order_key } }
+      - { name: product_key, type: string, nullable: false, foreign_key: { entity: Product, field: product_key } }
+      - { name: product_price, type: money }
+      - { name: supply_cost, type: money }
+    candidate_keys:
+      - [order_line_key]
+      - [order_key, product_key]
+    x: 470
+    y: 420
+    width: 380
+  - name: Product
+    type: logical_entity
+    domain: commerce
+    description: Product catalog entity for menu items.
+    fields:
+      - { name: product_key, type: string, primary_key: true, nullable: false }
+      - { name: product_name, type: string, nullable: false }
+      - { name: product_type, type: string }
+      - { name: product_price, type: money }
+    candidate_keys:
+      - [product_key]
+    business_keys:
+      - [product_key]
+    natural_key: product_key
+    x: 900
+    y: 420
+    width: 340
+  - name: Supply Component
+    type: logical_entity
+    domain: commerce
+    description: Supply component and cost used by products.
+    fields:
+      - { name: supply_component_key, type: string, primary_key: true, nullable: false }
+      - { name: supply_id, type: number }
+      - { name: product_key, type: string, nullable: false, foreign_key: { entity: Product, field: product_key } }
+      - { name: supply_name, type: string }
+      - { name: supply_cost, type: money }
+      - { name: is_perishable_supply, type: boolean }
+    candidate_keys:
+      - [supply_component_key]
+    x: 900
+    y: 720
+    width: 360
+relationships:
+  - name: customer_places_sales_order
+    from: { entity: Sales Order, field: customer_key }
+    to: { entity: Customer, field: customer_key }
+    cardinality: many_to_one
+    from_role: order customer
+    to_role: placed orders
+    description: Every sales order belongs to one customer; customers can place many orders.
+  - name: sales_order_contains_order_line
+    from: { entity: Order Line, field: order_key }
+    to: { entity: Sales Order, field: order_key }
+    cardinality: many_to_one
+    identifying: true
+    from_role: order line header
+    to_role: order lines
+  - name: order_line_identifies_product
+    from: { entity: Order Line, field: product_key }
+    to: { entity: Product, field: product_key }
+    cardinality: many_to_one
+    from_role: purchased product
+    to_role: line appearances
+  - name: supply_component_belongs_to_product
+    from: { entity: Supply Component, field: product_key }
+    to: { entity: Product, field: product_key }
+    cardinality: many_to_one
+    from_role: product supply component
+    to_role: supply components
+logic:
+  target_model: fct_orders
+  materialization: table
+  sql: |
+    select
+      order_key,
+      customer_key,
+      location_key,
+      ordered_at,
+      order_total,
+      tax_paid
+    from source_model

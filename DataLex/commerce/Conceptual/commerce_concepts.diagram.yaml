@@ -1,0 +1,80 @@
+kind: diagram
+name: commerce_concepts
+title: Jaffle Shop Commerce Conceptual Model
+layer: conceptual
+domain: commerce
+entities:
+  - name: Customer
+    type: concept
+    domain: commerce
+    owner: Customer Experience
+    description: Person or organization that places jaffle shop orders.
+    terms: [buyer, account]
+    x: 80
+    y: 100
+    width: 280
+  - name: Order
+    type: concept
+    domain: commerce
+    owner: Store Operations
+    description: Commercial event where a customer buys one or more products.
+    terms: [sale, basket]
+    x: 430
+    y: 100
+    width: 300
+  - name: Order Item
+    type: concept
+    domain: commerce
+    owner: Store Operations
+    description: A single product purchased as part of an order.
+    terms: [line item]
+    x: 430
+    y: 360
+    width: 300
+  - name: Product
+    type: concept
+    domain: commerce
+    owner: Product Operations
+    description: Sellable jaffle or beverage in the product catalog.
+    terms: [sku, menu item]
+    x: 800
+    y: 360
+    width: 300
+  - name: Supply
+    type: concept
+    domain: commerce
+    owner: Kitchen Operations
+    description: Ingredient or packaging cost component required to fulfill products.
+    terms: [ingredient, component]
+    x: 800
+    y: 610
+    width: 320
+relationships:
+  - name: customer_places_order
+    from: { entity: Customer }
+    to: { entity: Order }
+    cardinality: one_to_many
+    verb: places
+    relationship_type: event
+    description: A customer can place many orders; each order is placed by one customer.
+  - name: order_contains_order_item
+    from: { entity: Order }
+    to: { entity: Order Item }
+    cardinality: one_to_many
+    verb: contains
+    relationship_type: ownership
+    description: An order contains one or more order items.
+  - name: order_item_describes_product
+    from: { entity: Order Item }
+    to: { entity: Product }
+    cardinality: many_to_one
+    verb: describes
+    relationship_type: reference
+    description: Each order item identifies the product that was purchased.
+  - name: product_consumes_supply
+    from: { entity: Product }
+    to: { entity: Supply }
+    cardinality: one_to_many
+    verb: consumes
+    relationship_type: dependency
+    description: Products consume one or more supply components for fulfillment.
