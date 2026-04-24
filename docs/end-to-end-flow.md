@@ -8,6 +8,8 @@ This is the path a new user should follow when evaluating DataLex with jaffle-sh
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -U 'datalex-cli[serve,duckdb]'
+datalex --version
 dbt seed --profiles-dir .
 dbt build --profiles-dir .
 ```
@@ -21,7 +23,13 @@ Expected result:
 
 ## 2. Open in DataLex
 
-In DataLex, create or add a project using the repository root.
+Start DataLex against the repository root:
+
+```bash
+datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
+```
+
+In DataLex, verify the active project path is the repository root.
 
 Open the Explorer and verify these are visible:
 
@@ -63,7 +71,30 @@ Expected behavior:
 - Relationships map dbt/database FK intent.
 - Generated SQL/YAML under `DataLex/commerce/Generated/dbt` can be reviewed before promotion.
 
-## 6. Promote Generated dbt
+## 6. Interface Readiness
+
+Open `models/marts/core/dim_customers.yml` and `models/marts/core/fct_orders.yml`.
+
+Expected behavior:
+
+- DataLex shows Interface badges for the shared models.
+- The Validation panel reports owner, domain, version, unique key, freshness, column descriptions, and contract readiness.
+- `order_items` remains internal because it is an implementation bridge, not a governed shared contract.
+
+Run the CI-style check from a cloned DataLex repo:
+
+```bash
+cd /Users/Kranthi_1/DataLex
+.venv/bin/python ./datalex datalex mesh check /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex --strict
+```
+
+Expected result:
+
+- `dim_customers` passes as a shared customer Interface.
+- `fct_orders` passes as a shared order Interface.
+- `order_items` is skipped by mesh standards because it is marked internal.
+
+## 7. Promote Generated dbt
 
 After review, copy generated SQL/YAML into `models/marts/core`, then run:
 

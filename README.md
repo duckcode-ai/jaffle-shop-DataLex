@@ -9,7 +9,8 @@ This repository shows the full modeling flow:
 3. Open the repo in DataLex.
 4. Review conceptual, logical, and physical diagrams.
 5. Use the physical diagram to inspect dbt YAML-backed models and relationships.
-6. Review the generated dbt SQL/YAML staged by DataLex before promotion.
+6. Review Interface readiness for shared dbt models.
+7. Review the generated dbt SQL/YAML staged by DataLex before promotion.
 
 ## Repository Layout
 
@@ -33,12 +34,14 @@ This repository shows the full modeling flow:
 
 ## Quick Start
 
-Create a Python environment and install dbt DuckDB:
+Create a Python environment and install both dbt DuckDB and DataLex:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -U 'datalex-cli[serve,duckdb]'
+datalex --version
 ```
 
 Build the local warehouse:
@@ -52,7 +55,13 @@ This creates `jaffle_shop.duckdb` locally. The database file is intentionally ig
 
 ## DataLex Flow
 
-Open DataLex, then add this folder as a project:
+Run DataLex against this repo:
+
+```bash
+datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
+```
+
+Then open DataLex and confirm the project path is this folder:
 
 ```text
 /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
@@ -69,8 +78,21 @@ Recommended walkthrough:
 3. Open `DataLex/commerce/Physical/duckdb/commerce_physical.diagram.yaml`.
    - Physical nodes mirror dbt YAML files under `models/` and keep dbt paths visible in descriptions/tags.
    - Relationships show dbt/database intent: customer FK, order-item FK, product FK.
-4. Open `DataLex/commerce/Generated/dbt/customer_order_summary.sql` and `.yml`.
+4. Open `models/marts/core/dim_customers.yml` and `models/marts/core/fct_orders.yml`.
+   - Both are marked as DataLex Interfaces under `meta.datalex.interface`.
+   - `order_items` stays internal because it resolves order/product detail but is not a shared contract.
+5. Open `DataLex/commerce/Generated/dbt/customer_order_summary.sql` and `.yml`.
    - These show how logical modeling output can be staged before being promoted into dbt.
+
+If you are hacking on DataLex from source instead of using PyPI:
+
+```bash
+cd /Users/Kranthi_1/DataLex
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[serve,duckdb]'
+datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
+```
 
 ## Validate
 
@@ -94,6 +116,13 @@ for err in p.errors.errors:
 PY
 ```
 
+Run the DataLex mesh Interface standards check:
+
+```bash
+cd /Users/Kranthi_1/DataLex
+.venv/bin/python ./datalex datalex mesh check /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex --strict
+```
+
 ## Use Case
 
 The business asks: "How do customers place orders, what products are purchased, and what supply cost supports each order?"
@@ -109,3 +138,9 @@ The dbt mart layer then answers the question with:
 - `dim_customers`: customer lifecycle and lifetime spend.
 - `fct_orders`: order totals, taxes, and fulfillment cost.
 - `order_items`: product-level order line details.
+
+Interface policy:
+
+- `dim_customers` is a shared Interface for customer-level analysis.
+- `fct_orders` is a shared Interface for order-level analysis.
+- `order_items` is internal implementation detail and is not safe to consume directly.
