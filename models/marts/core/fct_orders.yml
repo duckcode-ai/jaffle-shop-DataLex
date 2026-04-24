@@ -3,6 +3,24 @@ version: 2
 models:
   - name: fct_orders
     description: Order fact table, one row per order with item and cost rollups.
+    config:
+      materialized: table
+      contract:
+        enforced: true
+    meta:
+      datalex:
+        interface:
+          enabled: true
+          owner: analytics-engineering
+          domain: commerce
+          status: active
+          version: v1
+          description: Shared order fact contract for order totals, tax, fulfillment cost, and customer joins.
+          unique_key: order_id
+          freshness:
+            warn_after: { count: 1, period: day }
+          stability: shared
+          audience: analytics engineers and finance reporting consumers
     columns:
       - name: order_id
         description: Primary key for the order.
@@ -20,36 +38,41 @@ models:
       - name: location_id
         description: Store location where the order was placed.
         data_type: integer
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: location_id
       - name: order_total
         description: Order total in USD, including tax.
-        data_type: decimal(12,2)
+        data_type: double
       - name: tax_paid
         description: Tax paid in USD.
-        data_type: decimal(12,2)
+        data_type: double
       - name: ordered_at
         description: Timestamp when the order was placed.
         data_type: timestamp
       - name: count_items
         description: Count of purchased items in the order.
-        data_type: integer
+        data_type: bigint
       - name: count_food_items
         description: Count of food items in the order.
-        data_type: integer
+        data_type: hugeint
       - name: count_drink_items
         description: Count of drink items in the order.
-        data_type: integer
+        data_type: hugeint
       - name: subtotal_food_items
         description: Food revenue before tax.
-        data_type: decimal(12,2)
+        data_type: double
       - name: subtotal_drink_items
         description: Drink revenue before tax.
-        data_type: decimal(12,2)
+        data_type: double
       - name: subtotal
         description: Total item revenue before tax.
-        data_type: decimal(12,2)
+        data_type: double
       - name: order_cost
         description: Supply cost required to fulfill the order.
-        data_type: decimal(12,2)
+        data_type: double
       - name: is_food_order
         description: True when the order contains at least one food item.
         data_type: boolean

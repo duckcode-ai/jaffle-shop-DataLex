@@ -3,6 +3,15 @@ version: 2
 models:
   - name: order_items
     description: Order line item mart, one row per purchased product.
+    config:
+      materialized: table
+    meta:
+      datalex:
+        interface:
+          enabled: false
+          stability: internal
+          status: draft
+          description: Internal implementation detail used to resolve orders to products.
     columns:
       - name: order_item_id
         description: Primary key for the order line item.

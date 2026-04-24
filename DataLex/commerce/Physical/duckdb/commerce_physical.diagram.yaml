@@ -10,6 +10,14 @@ entities:
     domain: commerce
     description: "Customer dimension with order history and lifetime value. dbt YAML: models/marts/core/dim_customers.yml"
     tags: [dbt, mart, dimension]
+    interface:
+      enabled: true
+      owner: analytics-engineering
+      domain: commerce
+      status: active
+      version: v1
+      unique_key: customer_id
+      stability: shared
     fields:
       - { name: customer_id, type: integer, primary_key: true, nullable: false }
       - { name: customer_name, type: varchar, nullable: false }
@@ -25,6 +33,14 @@ entities:
     domain: commerce
     description: "Order fact table at one row per customer order. dbt YAML: models/marts/core/fct_orders.yml"
     tags: [dbt, mart, fact]
+    interface:
+      enabled: true
+      owner: analytics-engineering
+      domain: commerce
+      status: active
+      version: v1
+      unique_key: order_id
+      stability: shared
     fields:
       - { name: order_id, type: integer, primary_key: true, nullable: false }
       - { name: customer_id, type: integer, nullable: false, foreign_key: { entity: dim_customers, field: customer_id } }
@@ -41,6 +57,9 @@ entities:
     domain: commerce
     description: "Order line bridge that resolves orders to products. dbt YAML: models/marts/core/order_items.yml"
     tags: [dbt, mart, bridge]
+    interface:
+      enabled: false
+      stability: internal
     fields:
       - { name: order_item_id, type: varchar, primary_key: true, nullable: false }
       - { name: order_id, type: integer, nullable: false, foreign_key: { entity: fct_orders, field: order_id } }
