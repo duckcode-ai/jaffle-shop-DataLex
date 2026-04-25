@@ -11,6 +11,7 @@ services:
     volumes:
       - .:/workspace
     command: >
-      sh -lc "dbt seed --profiles-dir .
+      sh -c "rm -rf target
+      && dbt seed --profiles-dir .
       && dbt build --profiles-dir .
       && datalex serve --project-dir /workspace --no-browser --port 3030"

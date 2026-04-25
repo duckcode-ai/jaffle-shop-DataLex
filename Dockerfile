@@ -19,7 +19,7 @@ RUN python3 -m venv /opt/venv \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
   && git clone --depth 1 --branch "${DATALEX_REF}" "${DATALEX_REPO}" /opt/DataLex \
-  && pip install -e "/opt/DataLex[serve,duckdb]" \
+  && pip install -e "/opt/DataLex[duckdb]" \
   && npm --prefix /opt/DataLex/packages/api-server install --silent \
   && npm --prefix /opt/DataLex/packages/web-app install --silent \
   && npm --prefix /opt/DataLex/packages/web-app run build --silent
@@ -28,4 +28,4 @@ COPY . .
 
 EXPOSE 3030
 
-CMD ["sh", "-lc", "dbt seed --profiles-dir . && dbt build --profiles-dir . && datalex serve --project-dir /workspace --no-browser --port ${PORT:-3030}"]
+CMD ["sh", "-c", "rm -rf target && dbt seed --profiles-dir . && dbt build --profiles-dir . && datalex serve --project-dir /workspace --no-browser --port ${PORT:-3030}"]
