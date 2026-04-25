@@ -1,0 +1,13 @@
+.git
+.venv
+__pycache__
+*.pyc
+.DS_Store
+logs
+target
+dbt_packages
+jaffle_shop.duckdb
+*.duckdb.wal
+.dm-projects.json
+.dm-connections.json
+.datalex/agent/runtime.sqlite

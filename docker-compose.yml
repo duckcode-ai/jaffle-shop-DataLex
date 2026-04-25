@@ -1,0 +1,16 @@
+services:
+  datalex:
+    build:
+      context: .
+      args:
+        DATALEX_REF: main
+    ports:
+      - "3030:3030"
+    environment:
+      PORT: "3030"
+    volumes:
+      - .:/workspace
+    command: >
+      sh -lc "dbt seed --profiles-dir .
+      && dbt build --profiles-dir .
+      && datalex serve --project-dir /workspace --no-browser --port 3030"

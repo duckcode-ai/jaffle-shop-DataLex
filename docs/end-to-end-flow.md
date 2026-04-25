@@ -5,10 +5,10 @@ This is the path a new user should follow when evaluating DataLex with jaffle-sh
 ## 1. Build dbt Locally
 
 ```bash
-python -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]'
+pip install -U 'datalex-cli[serve,duckdb]>=1.3.4'
 datalex --version
 dbt seed --profiles-dir .
 dbt build --profiles-dir .
@@ -30,6 +30,18 @@ datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
 ```
 
 In DataLex, verify the active project path is the repository root.
+
+## Docker Alternative
+
+From the repository root:
+
+```bash
+docker compose up --build
+```
+
+Open `http://localhost:3030`. The repository is mounted at
+`/workspace` inside the container, so use `/workspace` as the local dbt
+repo path if you run the import flow from the UI.
 
 Open the Explorer and verify these are visible:
 

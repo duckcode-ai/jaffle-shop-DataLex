@@ -1,0 +1,33 @@
+name: DataLex
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  dbt-and-datalex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Build DuckDB project
+        run: |
+          dbt seed --profiles-dir .
+          dbt build --profiles-dir .
+
+      - name: DataLex validate and mesh check
+        uses: duckcode-ai/DataLex/.github/actions/datalex@main
+        with:
+          root: .
+          strict: "false"
+          mesh-check: "true"

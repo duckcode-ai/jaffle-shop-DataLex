@@ -9,6 +9,7 @@ jaffle_shop.duckdb
 *.duckdb.wal
 .dm-projects.json
 .dm-connections.json
+.datalex/
 .user.yml
 /core/
 /domains/

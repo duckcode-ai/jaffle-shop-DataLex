@@ -22,11 +22,15 @@ This repository shows the full modeling flow:
 │       ├── Logical/commerce_logical.diagram.yaml
 │       ├── Physical/duckdb/commerce_physical.diagram.yaml
 │       └── Generated/dbt/
+├── Skills/
+│   └── *.md
 ├── models/
 │   ├── staging/jaffle_shop/
 │   ├── marts/core/
 │   └── semantic/
 ├── seeds/
+├── Dockerfile
+├── docker-compose.yml
 ├── dbt_project.yml
 ├── profiles.yml
 └── datalex.yaml
@@ -34,17 +38,40 @@ This repository shows the full modeling flow:
 
 ## Quick Start
 
-Create a Python environment and install both dbt DuckDB and DataLex:
+Use this repo when evaluating DataLex. It is intentionally different
+from the generic jaffle-shop starter because it includes DataLex
+conceptual, logical, physical, generated dbt, Interface, and skills
+assets.
+
+If you already have this workspace checked out locally, the project path
+is:
+
+```text
+/Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
+```
+
+For a fresh clone:
 
 ```bash
-python -m venv .venv
+git clone https://github.com/duckcode-ai/jaffle-shop-DataLex.git
+cd jaffle-shop-DataLex
+```
+
+### Option A: Local Python
+
+Use Python 3.11 or 3.12 for the dbt path. Python 3.14 can currently
+install `dbt-duckdb`, but dbt fails at runtime in one of its serializer
+dependencies.
+
+```bash
+python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]'
+pip install -U 'datalex-cli[serve,duckdb]>=1.3.4'
 datalex --version
 ```
 
-Build the local warehouse:
+Build the local DuckDB warehouse:
 
 ```bash
 dbt seed --profiles-dir .
@@ -53,19 +80,50 @@ dbt build --profiles-dir .
 
 This creates `jaffle_shop.duckdb` locally. The database file is intentionally ignored by git.
 
-## DataLex Flow
-
 Run DataLex against this repo:
+
+```bash
+datalex serve --project-dir .
+```
+
+Or from outside the repo:
 
 ```bash
 datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
 ```
 
-Then open DataLex and confirm the project path is this folder:
+### Option B: Docker
 
-```text
-/Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
+Docker gives a fully isolated dbt + DataLex runtime. It requires Docker
+Desktop or a running Docker daemon. The image installs DataLex from the
+DataLex GitHub repo at build time so the example can track fixes on
+`main` before a PyPI release is published.
+
+```bash
+docker compose up --build
 ```
+
+Open `http://localhost:3030`.
+
+The compose file bind-mounts this repo into `/workspace`, so DataLex
+edits and dbt artifacts are written back to your working tree. In the
+DataLex UI, use `/workspace` as the local folder path if you run an
+import flow from inside the container.
+
+Manual Docker commands:
+
+```bash
+docker build -t jaffle-shop-datalex:local .
+docker run --rm -p 3030:3030 -v "$PWD":/workspace jaffle-shop-datalex:local
+```
+
+To build against a specific DataLex tag or branch:
+
+```bash
+docker build --build-arg DATALEX_REF=main -t jaffle-shop-datalex:local .
+```
+
+## DataLex Flow
 
 Recommended walkthrough:
 
@@ -88,7 +146,7 @@ If you are hacking on DataLex from source instead of using PyPI:
 
 ```bash
 cd /Users/Kranthi_1/DataLex
-python3 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[serve,duckdb]'
 datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
@@ -100,6 +158,16 @@ datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
 dbt seed --profiles-dir .
 dbt build --profiles-dir .
 dbt test --profiles-dir .
+```
+
+With make:
+
+```bash
+make setup
+make seed
+make build
+make test
+make serve
 ```
 
 Optional DataLex core validation from a cloned DataLex repo:
