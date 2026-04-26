@@ -3,7 +3,7 @@ services:
     build:
       context: .
       args:
-        DATALEX_REF: main
+        DATALEX_VERSION: 1.3.4
     ports:
       - "3030:3030"
     environment:
