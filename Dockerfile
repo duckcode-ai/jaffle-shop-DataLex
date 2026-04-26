@@ -8,21 +8,16 @@ ENV PATH="/opt/venv/bin:${PATH}"
 WORKDIR /workspace
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 python3-venv python3-pip git ca-certificates curl \
+  && apt-get install -y --no-install-recommends python3 python3-venv python3-pip ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
-ARG DATALEX_REPO=https://github.com/duckcode-ai/DataLex.git
-ARG DATALEX_REF=main
+ARG DATALEX_VERSION=1.3.4
 
 COPY requirements.txt ./
 RUN python3 -m venv /opt/venv \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
-  && git clone --depth 1 --branch "${DATALEX_REF}" "${DATALEX_REPO}" /opt/DataLex \
-  && pip install -e "/opt/DataLex[duckdb]" \
-  && npm --prefix /opt/DataLex/packages/api-server install --silent \
-  && npm --prefix /opt/DataLex/packages/web-app install --silent \
-  && npm --prefix /opt/DataLex/packages/web-app run build --silent
+  && pip install "datalex-cli[duckdb]==${DATALEX_VERSION}"
 
 COPY . .
 

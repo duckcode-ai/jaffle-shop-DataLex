@@ -95,9 +95,9 @@ datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
 ### Option B: Docker
 
 Docker gives a fully isolated dbt + DataLex runtime. It requires Docker
-Desktop or a running Docker daemon. The image installs DataLex from the
-DataLex GitHub repo at build time so the example can track fixes on
-`main` before a PyPI release is published.
+Desktop or a running Docker daemon. The image installs the released
+`datalex-cli` package from PyPI, so it follows the same install path
+that users should run locally.
 
 ```bash
 docker compose up --build
@@ -117,10 +117,10 @@ docker build -t jaffle-shop-datalex:local .
 docker run --rm -p 3030:3030 -v "$PWD":/workspace jaffle-shop-datalex:local
 ```
 
-To build against a specific DataLex tag or branch:
+To build against a specific released DataLex version:
 
 ```bash
-docker build --build-arg DATALEX_REF=main -t jaffle-shop-datalex:local .
+docker build --build-arg DATALEX_VERSION=1.3.4 -t jaffle-shop-datalex:local .
 ```
 
 ## DataLex Flow
