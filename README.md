@@ -2,15 +2,29 @@
 
 Clean, local-first example for trying DataLex with a dbt project backed by DuckDB.
 
-This repository shows the full modeling flow:
+## What DataLex Solves
+
+Modern analytics teams often move fast in dbt, but the business meaning, model grain, ownership, quality tests, governance, and semantic context are spread across SQL, YAML, tickets, and tribal knowledge. That makes AI agents and semantic layers less reliable because they cannot tell which models are trusted, what each field means, or how business concepts relate to physical tables.
+
+DataLex adds a governed modeling layer around dbt without hiding the files:
+
+- Clarifies the problem first: scattered business meaning, inconsistent dbt YAML, weak ownership, and late quality discovery.
+- Keeps conceptual, logical, and physical models connected so business language, data structure, and dbt implementation stay aligned.
+- Reviews dbt/DataLex YAML for metadata, tests, contracts, relationships, governance, and enterprise modeling readiness.
+- Shows red, yellow, and green readiness directly on the same files users need to inspect and fix.
+- Creates reviewable AI proposals for YAML improvements instead of silently rewriting project assets.
+- Helps AI agentic analytics and semantic models answer more accurately by grounding them in trusted definitions, grain, lineage, and governance signals.
+
+This repository shows the full onboarding flow:
 
 1. Load small jaffle shop seed data into local DuckDB.
 2. Build dbt staging and mart models.
-3. Open the repo in DataLex.
-4. Review conceptual, logical, and physical diagrams.
-5. Use the physical diagram to inspect dbt YAML-backed models and relationships.
-6. Review Interface readiness for shared dbt models.
-7. Review the generated dbt SQL/YAML staged by DataLex before promotion.
+3. Open the repo in DataLex and understand the problem/solution walkthrough.
+4. Review dbt readiness results on imported YAML files.
+5. Review conceptual, logical, and physical diagrams.
+6. Use the physical diagram to inspect dbt YAML-backed models and relationships.
+7. Review Interface readiness for shared dbt models.
+8. Review the generated dbt SQL/YAML staged by DataLex before promotion.
 
 ## Repository Layout
 
@@ -67,7 +81,7 @@ dependencies.
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.4'
+pip install -U 'datalex-cli[serve,duckdb]>=1.3.5'
 datalex --version
 ```
 
@@ -120,26 +134,34 @@ docker run --rm -p 3030:3030 -v "$PWD":/workspace jaffle-shop-datalex:local
 To build against a specific released DataLex version:
 
 ```bash
-docker build --build-arg DATALEX_VERSION=1.3.4 -t jaffle-shop-datalex:local .
+docker build --build-arg DATALEX_VERSION=1.3.5 -t jaffle-shop-datalex:local .
 ```
 
 ## DataLex Flow
 
 Recommended walkthrough:
 
-1. Open `DataLex/commerce/Conceptual/commerce_concepts.diagram.yaml`.
+1. Start with the onboarding tour.
+   - DataLex explains the core problem: dbt projects often have useful SQL but missing business meaning, incomplete YAML, unclear ownership, and weak governance signals.
+   - The tour then shows how import, readiness review, modeling layers, validation, AI proposals, and Git review work together.
+2. Open Explorer and review dbt readiness badges beside YAML files.
+   - Red means important metadata, tests, governance, parse, or modeling readiness gaps need attention.
+   - Yellow means the file is usable but has improvement opportunities.
+   - Green means the deterministic standards are satisfied for this demo scope.
+   - Click a YAML file to see why each check matters and the suggested YAML change.
+3. Open `DataLex/commerce/Conceptual/commerce_concepts.diagram.yaml`.
    - Business-only concepts: Customer, Order, Order Item, Product, Supply.
    - Relationships use business verbs such as places, contains, describes, consumes.
-2. Open `DataLex/commerce/Logical/commerce_logical.diagram.yaml`.
+4. Open `DataLex/commerce/Logical/commerce_logical.diagram.yaml`.
    - Logical attributes, candidate keys, business keys, associative entity, and role names.
    - The Order Line entity resolves the many-to-many Order to Product relationship.
-3. Open `DataLex/commerce/Physical/duckdb/commerce_physical.diagram.yaml`.
+5. Open `DataLex/commerce/Physical/duckdb/commerce_physical.diagram.yaml`.
    - Physical nodes mirror dbt YAML files under `models/` and keep dbt paths visible in descriptions/tags.
    - Relationships show dbt/database intent: customer FK, order-item FK, product FK.
-4. Open `models/marts/core/dim_customers.yml` and `models/marts/core/fct_orders.yml`.
+6. Open `models/marts/core/dim_customers.yml` and `models/marts/core/fct_orders.yml`.
    - Both are marked as DataLex Interfaces under `meta.datalex.interface`.
    - `order_items` stays internal because it resolves order/product detail but is not a shared contract.
-5. Open `DataLex/commerce/Generated/dbt/customer_order_summary.sql` and `.yml`.
+7. Open `DataLex/commerce/Generated/dbt/customer_order_summary.sql` and `.yml`.
    - These show how logical modeling output can be staged before being promoted into dbt.
 
 If you are hacking on DataLex from source instead of using PyPI:
