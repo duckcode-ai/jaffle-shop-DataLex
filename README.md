@@ -76,23 +76,31 @@ cd jaffle-shop-DataLex
 
 ### Option A: Local Python
 
-Use Python 3.11 or 3.12 for the dbt path. Python 3.14 can currently
-install `dbt-duckdb`, but dbt fails at runtime in one of its serializer
-dependencies.
+Use Python 3.11 or 3.12 for the dbt path. Do not use Python 3.13 or
+3.14 for this demo; dbt dependencies can install but fail at runtime.
+
+Recommended setup:
+
+```bash
+make setup
+make doctor
+```
+
+Equivalent manual setup:
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.6'
+pip install -U 'datalex-cli[serve,duckdb]>=1.3.7'
 datalex --version
 ```
 
 Build the local DuckDB warehouse:
 
 ```bash
-dbt seed --profiles-dir .
-dbt build --profiles-dir .
+make seed
+make build
 ```
 
 This creates `jaffle_shop.duckdb` locally. The database file is intentionally ignored by git.
@@ -100,7 +108,7 @@ This creates `jaffle_shop.duckdb` locally. The database file is intentionally ig
 Run DataLex against this repo:
 
 ```bash
-datalex serve --project-dir .
+make serve
 ```
 
 Or from outside the repo:
@@ -127,6 +135,12 @@ edits and dbt artifacts are written back to your working tree. In the
 DataLex UI, use `/workspace` as the local folder path if you run an
 import flow from inside the container.
 
+The compose file also mounts your host home folder at the same path
+inside the container. That means a dbt repo under your home directory,
+for example `/Users/you/projects/my-dbt-repo`, can be entered with the
+same path in the DataLex UI. Paths outside your home directory must be
+added as extra Docker volumes before DataLex can read them.
+
 Manual Docker commands:
 
 ```bash
@@ -137,7 +151,7 @@ docker run --rm -p 3030:3030 -v "$PWD":/workspace jaffle-shop-datalex:local
 To build against a specific released DataLex version:
 
 ```bash
-docker build --build-arg DATALEX_VERSION=1.3.6 -t jaffle-shop-datalex:local .
+docker build --build-arg DATALEX_VERSION=1.3.7 -t jaffle-shop-datalex:local .
 ```
 
 ## DataLex Flow
