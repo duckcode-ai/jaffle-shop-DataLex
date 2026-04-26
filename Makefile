@@ -6,7 +6,7 @@ setup:
 	$(PYTHON) -m venv .venv
 	. .venv/bin/activate && pip install --upgrade pip
 	. .venv/bin/activate && pip install -r requirements.txt
-	. .venv/bin/activate && pip install 'datalex-cli[serve,duckdb]>=1.3.5'
+	. .venv/bin/activate && pip install 'datalex-cli[serve,duckdb]>=1.3.6'
 
 seed:
 	dbt seed --profiles-dir .

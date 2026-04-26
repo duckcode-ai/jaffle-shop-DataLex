@@ -4,7 +4,10 @@ Clean, local-first example for trying DataLex with a dbt project backed by DuckD
 
 ## What DataLex Solves
 
-Modern analytics teams often move fast in dbt, but the business meaning, model grain, ownership, quality tests, governance, and semantic context are spread across SQL, YAML, tickets, and tribal knowledge. That makes AI agents and semantic layers less reliable because they cannot tell which models are trusted, what each field means, or how business concepts relate to physical tables.
+DataLex helps teams turn dbt projects into governed, AI-ready analytics models.
+It keeps business meaning, relationships, standards, and YAML fixes close to the files your team already owns.
+
+Modern analytics teams often move fast in dbt, but dbt lineage is not enough. The business concepts, relationship meaning, model grain, ownership, quality expectations, governance, and semantic context are often spread across SQL, YAML, tickets, and tribal knowledge. That makes AI agents and semantic layers less reliable because they cannot tell which models are trusted, what each field means, or how business concepts relate to physical tables.
 
 DataLex adds a governed modeling layer around dbt without hiding the files:
 
@@ -81,7 +84,7 @@ dependencies.
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.5'
+pip install -U 'datalex-cli[serve,duckdb]>=1.3.6'
 datalex --version
 ```
 
@@ -134,7 +137,7 @@ docker run --rm -p 3030:3030 -v "$PWD":/workspace jaffle-shop-datalex:local
 To build against a specific released DataLex version:
 
 ```bash
-docker build --build-arg DATALEX_VERSION=1.3.5 -t jaffle-shop-datalex:local .
+docker build --build-arg DATALEX_VERSION=1.3.6 -t jaffle-shop-datalex:local .
 ```
 
 ## DataLex Flow
@@ -142,8 +145,10 @@ docker build --build-arg DATALEX_VERSION=1.3.5 -t jaffle-shop-datalex:local .
 Recommended walkthrough:
 
 1. Start with the onboarding tour.
-   - DataLex explains the core problem: dbt projects often have useful SQL but missing business meaning, incomplete YAML, unclear ownership, and weak governance signals.
-   - The tour then shows how import, readiness review, modeling layers, validation, AI proposals, and Git review work together.
+   - Welcome to DataLex: the goal is governed, AI-ready analytics models.
+   - Problem: dbt lineage shows dependencies, but it often misses business concepts, relationship meaning, grain, ownership, quality expectations, and governance context.
+   - Solution: DataLex connects business concepts to logical rules and physical dbt assets, reviews YAML standards before gaps spread, and keeps fixes reviewable through AI proposals and Git diffs.
+   - Product demo: import, readiness review, modeling layers, relationships, validation, AI-assisted fixes, and saving approved YAML changes.
 2. Open Explorer and review dbt readiness badges beside YAML files.
    - Red means important metadata, tests, governance, parse, or modeling readiness gaps need attention.
    - Yellow means the file is usable but has improvement opportunities.

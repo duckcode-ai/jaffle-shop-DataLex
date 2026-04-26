@@ -2,20 +2,20 @@
 
 This is the path a new user should follow when evaluating DataLex with jaffle-shop.
 
-## 0. Understand the DataLex Problem
+## 0. Start the DataLex Tour
 
-Start with the product framing before opening files:
+The first-run and replay tour now follow the same sequence:
 
-- dbt projects can have strong SQL but weak shared meaning: unclear grain, missing descriptions, thin ownership, and inconsistent tests.
+- Welcome to DataLex: DataLex helps teams turn dbt projects into governed, AI-ready analytics models.
+- Problem: dbt lineage shows SQL dependencies, but it often misses business concepts, relationship meaning, grain, ownership, quality expectations, and governance context.
+- Solution: DataLex connects business concepts to logical rules and physical dbt assets, reviews YAML standards before gaps spread, and keeps fixes reviewable through AI proposals and Git diffs.
+- Product demo: the tour walks through import, readiness review, modeling layers, relationships, validation, AI-assisted fixes, and saving approved YAML changes.
+
+Why this matters:
+
 - Conceptual, logical, and physical modeling are usually skipped by modern analytics teams because they feel separate from dbt work.
 - AI agents, semantic models, and business users need those standards because accurate answers depend on trusted definitions, relationships, lineage, and governance.
 - DataLex keeps the dbt files visible, reviews their readiness, and connects them to business and data architecture models.
-
-Expected onboarding message:
-
-- Problem: scattered business meaning and inconsistent dbt metadata reduce trust.
-- Solution: guided import, readiness review, modeling layers, validation, AI proposals, and Git-reviewed changes.
-- Benefit: earlier gap detection, cleaner dbt YAML, stronger semantic contracts, and more reliable AI-assisted analytics.
 
 ## 1. Build dbt Locally
 
@@ -23,7 +23,7 @@ Expected onboarding message:
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.5'
+pip install -U 'datalex-cli[serve,duckdb]>=1.3.6'
 datalex --version
 dbt seed --profiles-dir .
 dbt build --profiles-dir .
