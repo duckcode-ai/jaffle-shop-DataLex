@@ -20,13 +20,10 @@ Why this matters:
 ## 1. Build dbt Locally
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.6'
-datalex --version
-dbt seed --profiles-dir .
-dbt build --profiles-dir .
+make setup
+make doctor
+make seed
+make build
 ```
 
 Expected result:
@@ -56,7 +53,9 @@ docker compose up --build
 
 Open `http://localhost:3030`. The repository is mounted at
 `/workspace` inside the container, so use `/workspace` as the local dbt
-repo path if you run the import flow from the UI.
+repo path if you run the import flow from the UI. Your host home folder
+is also mounted at the same path, so dbt repos under `/Users/...` or
+`/home/...` can be entered with their normal host path.
 
 Open the Explorer and verify these are visible:
 
