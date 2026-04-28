@@ -9,9 +9,20 @@ entities:
     domain: commerce
     description: Customer business entity with lifecycle attributes.
     fields:
-      - { name: customer_key, type: number, primary_key: true, nullable: false }
-      - { name: customer_name, type: string, nullable: false }
-      - { name: customer_type, type: string }
+      - name: customer_key
+        type: number
+        primary_key: true
+        nullable: false
+        binding: { glossary_term: customer_id, status: approved }
+      - name: customer_name
+        type: string
+        nullable: false
+      - name: customer_type
+        type: string
+      - name: customer_email
+        type: string
+        tags: [pii]
+        binding: { glossary_term: customer_email, status: approved }
     candidate_keys:
       - [customer_key]
     business_keys:
@@ -25,12 +36,25 @@ entities:
     domain: commerce
     description: Header-level order event placed by a customer.
     fields:
-      - { name: order_key, type: number, primary_key: true, nullable: false }
-      - { name: customer_key, type: number, nullable: false, foreign_key: { entity: Customer, field: customer_key } }
-      - { name: location_key, type: number }
-      - { name: ordered_at, type: timestamp }
-      - { name: order_total, type: money }
-      - { name: tax_paid, type: money }
+      - name: order_key
+        type: number
+        primary_key: true
+        nullable: false
+      - name: customer_key
+        type: number
+        nullable: false
+        foreign_key: { entity: Customer, field: customer_key }
+        binding: { glossary_term: customer_id, status: approved }
+      - name: location_key
+        type: number
+      - name: ordered_at
+        type: timestamp
+        binding: { glossary_term: ordered_at, status: approved }
+      - name: order_total
+        type: money
+        binding: { glossary_term: order_total, status: approved }
+      - name: tax_paid
+        type: money
     candidate_keys:
       - [order_key]
     x: 470

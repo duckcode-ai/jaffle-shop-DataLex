@@ -2,7 +2,7 @@ PYTHON ?= $(shell command -v python3.12 2>/dev/null || command -v python3.11 2>/
 VENV := .venv
 BIN := $(VENV)/bin
 
-.PHONY: setup doctor seed build test serve docker-build docker-up docker-down clean
+.PHONY: setup doctor seed build test serve readiness-gate docs-reindex policy-check emit-catalog docker-build docker-up docker-down clean
 
 setup:
 	@test -n "$(PYTHON)" || (echo "Python 3.12 or 3.11 is required. Install one, then rerun make setup."; exit 1)
@@ -12,7 +12,7 @@ setup:
 	$(PYTHON) -m venv $(VENV)
 	$(BIN)/python -m pip install --upgrade pip
 	$(BIN)/python -m pip install -r requirements.txt
-	$(BIN)/python -m pip install --no-cache-dir 'datalex-cli[serve,duckdb]>=1.3.7'
+	$(BIN)/python -m pip install --no-cache-dir 'datalex-cli[serve,duckdb]>=1.4.0'
 
 doctor:
 	@$(BIN)/python --version
@@ -31,6 +31,30 @@ test:
 
 serve:
 	$(BIN)/datalex serve --project-dir .
+
+# DataLex 1.4 — red/yellow/green readiness gate (also runs in CI).
+readiness-gate:
+	$(BIN)/datalex readiness-gate --project . --min-score 70 \
+	  --sarif datalex-readiness.sarif --pr-comment datalex-readiness.md
+
+# Rebuild the {% docs %} index used by AI retrieval + the inspector.
+docs-reindex:
+	$(BIN)/datalex dbt docs reindex --project-dir .
+
+# Run the custom policy pack against an example model.
+policy-check:
+	$(BIN)/datalex policy-check models/marts/core/fct_orders.yml \
+	  --policy .datalex/policies/jaffle.policy.yaml --inherit
+
+# Export the glossary + bindings to every supported catalog target.
+emit-catalog:
+	mkdir -p out/catalog
+	$(BIN)/datalex emit catalog --target atlan \
+	  --model DataLex/commerce/_glossary.model.yaml --out out/catalog
+	$(BIN)/datalex emit catalog --target datahub \
+	  --model DataLex/commerce/_glossary.model.yaml --out out/catalog
+	$(BIN)/datalex emit catalog --target openmetadata \
+	  --model DataLex/commerce/_glossary.model.yaml --out out/catalog
 
 docker-build:
 	docker build -t jaffle-shop-datalex:local .

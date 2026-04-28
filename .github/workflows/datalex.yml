@@ -1,15 +1,22 @@
 name: DataLex
-
 on:
   pull_request:
   push:
     branches: [main]
+
+permissions:
+  contents: read
+  issues: write           # sticky PR comments
+  pull-requests: write
+  security-events: write  # SARIF upload
 
 jobs:
   dbt-and-datalex:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -25,9 +32,22 @@ jobs:
           dbt seed --profiles-dir .
           dbt build --profiles-dir .
 
+      # Legacy DataLex action — keeps validate + mesh checks running.
       - name: DataLex validate and mesh check
         uses: duckcode-ai/DataLex/.github/actions/datalex@main
         with:
           root: .
           strict: "false"
           mesh-check: "true"
+
+      # New: red/yellow/green readiness gate. Posts a sticky PR comment,
+      # uploads SARIF, and enforces a project-level score floor.
+      - name: DataLex readiness gate
+        uses: duckcode-ai/DataLex/actions/datalex-gate@main
+        with:
+          project-path: .
+          # Demo threshold — ratchet up as the project's metadata
+          # coverage improves. Today the baseline is ~78/100.
+          min-score: 70
+          changed-only: true
+          base-ref: origin/${{ github.base_ref || 'main' }}

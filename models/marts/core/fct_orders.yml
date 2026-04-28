@@ -23,11 +23,11 @@ models:
           audience: analytics engineers and finance reporting consumers
     columns:
       - name: order_id
-        description: Primary key for the order.
+        description: '{{ doc("order_id") }}'
         data_type: integer
         tests: [not_null, unique]
       - name: customer_id
-        description: Customer who placed the order.
+        description: '{{ doc("customer_id") }}'
         data_type: integer
         tests:
           - not_null
@@ -44,13 +44,13 @@ models:
                 to: ref('stg_orders')
                 field: location_id
       - name: order_total
-        description: Order total in USD, including tax.
+        description: '{{ doc("order_total") }}'
         data_type: double
       - name: tax_paid
         description: Tax paid in USD.
         data_type: double
       - name: ordered_at
-        description: Timestamp when the order was placed.
+        description: '{{ doc("ordered_at") }}'
         data_type: timestamp
       - name: count_items
         description: Count of purchased items in the order.
