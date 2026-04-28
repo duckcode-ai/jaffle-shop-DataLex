@@ -5,7 +5,7 @@ models:
     description: Clean customer records, one row per customer.
     columns:
       - name: customer_id
-        description: Primary key for a customer.
+        description: '{{ doc("customer_id") }}'
         data_type: integer
         tests: [not_null, unique]
       - name: customer_name

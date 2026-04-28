@@ -9,7 +9,11 @@ jaffle_shop.duckdb
 *.duckdb.wal
 .dm-projects.json
 .dm-connections.json
-.datalex/
+# DataLex local runtime (cache + per-machine config). Keep
+# .datalex/policies/ tracked — the readiness gate uses it.
+.datalex/cache/
+.datalex/*.local.json
+.datalex/credentials.json
 .user.yml
 /core/
 /domains/

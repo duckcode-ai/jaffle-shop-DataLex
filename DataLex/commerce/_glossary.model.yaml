@@ -1,0 +1,34 @@
+kind: glossary
+domain: commerce
+title: Jaffle Shop Glossary
+description: >
+  Business glossary for the commerce domain. Terms here back the
+  `binding: { glossary_term, status }` references on logical and physical
+  columns so AI agents and external catalogs (Atlan, DataHub,
+  OpenMetadata) see the same definitions.
+
+glossary:
+  - term: customer_id
+    definition: Surrogate key uniquely identifying a customer across all jaffle-shop systems.
+    tags: [identity, mart-stable]
+    related_fields:
+      - Customer.customer_key
+      - Sales Order.customer_key
+
+  - term: customer_email
+    definition: Primary email used for receipts, login, and marketing. Treated as PII.
+    tags: [pii]
+    related_fields:
+      - Customer.customer_email
+
+  - term: order_total
+    definition: Order total in USD, inclusive of tax and discounts.
+    tags: [revenue, currency-usd]
+    related_fields:
+      - Sales Order.order_total
+
+  - term: ordered_at
+    definition: UTC timestamp when the customer placed the order. Grain column for fct_orders.
+    tags: [grain, timestamp-utc]
+    related_fields:
+      - Sales Order.ordered_at

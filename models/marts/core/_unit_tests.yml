@@ -1,0 +1,20 @@
+version: 2
+
+unit_tests:
+  - name: test_fct_orders_subtotal_rollup
+    description: >
+      `fct_orders.subtotal` must equal `subtotal_food_items + subtotal_drink_items`
+      for every order. This test pins the rollup logic so a regression in
+      the SQL surfaces locally before it lands in production.
+    model: fct_orders
+    given:
+      - input: ref('order_items')
+        rows:
+          - { order_id: 1, supply_cost: 1.0, product_price: 10.0, is_food_item: 1, is_drink_item: 0 }
+          - { order_id: 1, supply_cost: 0.5, product_price:  5.0, is_food_item: 0, is_drink_item: 1 }
+      - input: ref('stg_orders')
+        rows:
+          - { order_id: 1, customer_id: 1, location_id: 1, ordered_at: "2024-01-01", order_total: 16.5, tax_paid: 1.5 }
+    expect:
+      rows:
+        - { order_id: 1, subtotal_food_items: 10.0, subtotal_drink_items: 5.0, subtotal: 15.0 }

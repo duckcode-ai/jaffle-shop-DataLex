@@ -1,0 +1,17 @@
+version: 2
+
+snapshots:
+  - name: customers_snapshot
+    description: SCD Type 2 history of customer attributes from stg_customers.
+    config:
+      strategy: check
+      unique_key: customer_id
+      check_cols: [customer_name]
+      invalidate_hard_deletes: true
+    columns:
+      - name: customer_id
+        description: '{{ doc("customer_id") }}'
+        data_type: integer
+      - name: customer_name
+        description: Display name as observed at the snapshot time.
+        data_type: varchar
