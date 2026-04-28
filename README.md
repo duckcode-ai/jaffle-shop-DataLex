@@ -140,8 +140,8 @@ Equivalent manual setup:
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.7'
-datalex --version
+pip install -U 'datalex-cli[serve,duckdb]>=1.4.1'
+datalex --version    # 1.4.1+
 ```
 
 Build the local DuckDB warehouse:
@@ -164,6 +164,23 @@ Or from outside the repo:
 ```bash
 datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
 ```
+
+### When the app opens — the Onboarding Journey (1.4.1)
+
+A six-step right-rail panel walks you through the demo end to end:
+
+| # | Step | What to do here |
+|---|---|---|
+| 1 | **Welcome** | Click *Let's go* — two-line value prop |
+| 2 | **Connect your project** | Pick **Local folder** and paste this repo's absolute path. Tick **Edit in place** so saves write back to the same YAML files. |
+| 3 | **See what's missing** | The Validation drawer opens. Click any red file (e.g. `models/marts/core/fct_orders.yml`) to see readiness gaps — exactly what `datalex readiness-gate` enforces in CI. |
+| 4 | **Design your first business domain** | Click `+` to add a logical entity. The repo already ships `DataLex/commerce/` with conceptual + logical + physical layers as a reference. |
+| 5 | **Add your AI provider** | Settings → AI: paste an OpenAI / Anthropic key (or pick the local provider). The Conceptualizer + Canonicalizer agents work without an API key when set to `local`. |
+| 6 | **Ask AI to draw a diagram** | One click runs the **Conceptualizer** against the staging models — it'll propose entities like `Customer`, `Order`, `OrderItem`, `Product`, `Store`, `Supply` with FK relationships. Review and apply through the AI proposal preview. |
+
+Progress saves automatically. Replay anytime via **Settings → Replay
+onboarding**; the legacy 13-step spotlight tour is under **Settings →
+Deep feature tour**.
 
 ### Option B: Docker
 
