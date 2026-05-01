@@ -1,0 +1,150 @@
+{
+  "manifestSpecVersion": "1.0.0",
+  "datalexVersion": "1.8.2",
+  "generatedAt": "2026-05-01T12:00:00Z",
+  "project": {
+    "name": "jaffle_shop_datalex",
+    "description": "Hand-curated v1 manifest for the jaffle-shop walkthrough. Will be auto-emitted by the DataLex compiler once the v1 emitter ships; until then, this file is the canonical artifact DQL consumes when its `datalex_contract` references resolve.",
+    "dialect": "duckdb",
+    "owners": ["data@duckcode.ai"]
+  },
+  "domains": [
+    {
+      "name": "commerce",
+      "description": "Order and customer concepts for the jaffle shop.",
+      "owners": ["data@duckcode.ai"],
+      "entities": [
+        {
+          "name": "Customer",
+          "description": "One row per customer.",
+          "tags": ["GOLD", "MART", "PII"],
+          "fields": [
+            {
+              "name": "customer_id",
+              "type": "integer",
+              "primary_key": true,
+              "nullable": false,
+              "description": "Surrogate key uniquely identifying a customer."
+            },
+            {
+              "name": "customer_email",
+              "type": "string",
+              "nullable": false,
+              "classification": "PII",
+              "description": "Primary email used for receipts, login, and marketing."
+            },
+            {
+              "name": "lifetime_spend",
+              "type": "decimal(12,2)",
+              "description": "Customer lifetime gross spend including tax."
+            }
+          ],
+          "contracts": [
+            {
+              "id": "commerce.Customer.monthly_active_customers",
+              "name": "monthly_active_customers",
+              "version": 1,
+              "description": "Distinct customers who placed at least one order in the calendar month.",
+              "signature": {
+                "inputs": [
+                  {"name": "order_month", "type": "date"}
+                ],
+                "outputs": [
+                  {"name": "monthly_active_customers", "type": "integer", "constraints": ["positive"]}
+                ]
+              },
+              "owner": "growth@jaffle.example",
+              "tags": ["customers", "mau", "engagement", "monthly", "finance-mbr"]
+            },
+            {
+              "id": "commerce.Customer.customer_lifetime_value",
+              "name": "customer_lifetime_value",
+              "version": 1,
+              "description": "Total gross revenue per customer across all orders, including tax.",
+              "signature": {
+                "inputs": [
+                  {"name": "customer_id", "type": "integer"}
+                ],
+                "outputs": [
+                  {"name": "lifetime_spend", "type": "decimal(12,2)", "constraints": ["non_negative"]}
+                ]
+              },
+              "owner": "growth@jaffle.example",
+              "tags": ["customers", "ltv", "revenue", "currency-usd"]
+            }
+          ],
+          "binding": {
+            "kind": "dbt_model",
+            "ref": "dim_customers"
+          }
+        },
+        {
+          "name": "Order",
+          "description": "One row per completed order.",
+          "tags": ["GOLD", "MART"],
+          "fields": [
+            {
+              "name": "order_id",
+              "type": "integer",
+              "primary_key": true,
+              "nullable": false
+            },
+            {
+              "name": "customer_id",
+              "type": "integer",
+              "nullable": false,
+              "description": "FK to Customer."
+            },
+            {
+              "name": "ordered_at",
+              "type": "timestamp",
+              "nullable": false,
+              "description": "UTC timestamp the order was placed."
+            },
+            {
+              "name": "order_total",
+              "type": "decimal(12,2)",
+              "description": "Order total in USD, inclusive of tax and discounts."
+            }
+          ],
+          "contracts": [
+            {
+              "id": "commerce.Order.monthly_revenue",
+              "name": "monthly_revenue",
+              "version": 1,
+              "description": "Monthly order count and gross revenue from fct_orders.",
+              "signature": {
+                "inputs": [
+                  {"name": "order_month", "type": "date"}
+                ],
+                "outputs": [
+                  {"name": "order_count", "type": "integer", "constraints": ["positive"]},
+                  {"name": "revenue", "type": "decimal(12,2)", "constraints": ["non_negative"]}
+                ]
+              },
+              "owner": "finance@jaffle.example",
+              "tags": ["orders", "revenue", "monthly", "finance-mbr"]
+            },
+            {
+              "id": "commerce.Order.order_total_non_negative",
+              "name": "order_total_non_negative",
+              "version": 1,
+              "description": "Invariant — every fct_orders.order_total is non-negative.",
+              "signature": {
+                "outputs": [
+                  {"name": "order_total", "type": "decimal(12,2)", "constraints": ["non_negative"]}
+                ]
+              },
+              "owner": "finance@jaffle.example",
+              "tags": ["orders", "invariant", "data-quality"]
+            }
+          ],
+          "binding": {
+            "kind": "dbt_model",
+            "ref": "fct_orders"
+          }
+        }
+      ]
+    }
+  ]
+}
