@@ -2,6 +2,8 @@
 
 Clean, local-first example for trying DataLex with a dbt project backed by DuckDB.
 
+> **Part of a two-stage walkthrough.** This repo is **Stage 1** — author the data contracts, conceptual model, and dbt readiness in DataLex. **Stage 2** is [jaffle-shop-dql](https://github.com/duckcode-ai/jaffle-shop-dql), where you build certified DQL blocks against the contracts you author here and serve trusted answers to AI agents via the DQL MCP. Each repo also stands alone if you only want one half of the story.
+
 ## What DataLex Solves
 
 DataLex helps teams turn dbt projects into governed, AI-ready analytics models.
