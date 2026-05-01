@@ -1,0 +1,97 @@
+kind: contracts
+domain: commerce
+title: Jaffle Shop commerce-domain contracts
+description: >
+  Versioned, machine-checkable contracts for the commerce domain. DQL blocks
+  reference these by id (commerce.<Entity>.<contract_name>@<version>) and the
+  DQL compiler enforces the binding via the manifest-spec v1 interop pattern.
+  See https://github.com/duckcode-ai/manifest-spec/blob/main/docs/interop.md.
+
+# These contracts are also exported as the canonical
+# `datalex-manifest.json` at the repo root so DQL projects in this
+# walkthrough can drop the manifest in and resolve references today,
+# before the DataLex compiler natively emits the v1 manifest.
+
+contracts:
+
+  - id: commerce.Customer.monthly_active_customers
+    name: monthly_active_customers
+    entity: Customer
+    version: 1
+    description: |
+      Distinct customers who placed at least one order in the calendar
+      month, computed from fct_orders.customer_id grouped by
+      DATE_TRUNC('month', ordered_at). Backs the customer engagement view
+      of the monthly business review.
+    owner: growth@jaffle.example
+    tags: [customers, mau, engagement, monthly, finance-mbr]
+    signature:
+      inputs:
+        - name: order_month
+          type: date
+          description: First day of the calendar month being reported on.
+      outputs:
+        - name: monthly_active_customers
+          type: integer
+          description: Count of distinct customers who placed at least one order in the month.
+          constraints: ["positive"]
+
+  - id: commerce.Customer.customer_lifetime_value
+    name: customer_lifetime_value
+    entity: Customer
+    version: 1
+    description: |
+      Total gross revenue per customer across all orders, including tax.
+      Sourced from dim_customers.lifetime_spend.
+    owner: growth@jaffle.example
+    tags: [customers, ltv, revenue, currency-usd]
+    signature:
+      inputs:
+        - name: customer_id
+          type: integer
+          description: Surrogate key from dim_customers.
+      outputs:
+        - name: lifetime_spend
+          type: decimal(12,2)
+          description: Customer lifetime gross revenue including tax.
+          constraints: ["non_negative"]
+
+  - id: commerce.Order.monthly_revenue
+    name: monthly_revenue
+    entity: Order
+    version: 1
+    description: |
+      Monthly order count and gross revenue from fct_orders. Backs the
+      monthly business review dashboard owned by finance.
+    owner: finance@jaffle.example
+    tags: [orders, revenue, monthly, finance-mbr]
+    signature:
+      inputs:
+        - name: order_month
+          type: date
+          description: First day of the calendar month being reported on.
+      outputs:
+        - name: order_count
+          type: integer
+          description: Number of orders placed in the month.
+          constraints: ["positive"]
+        - name: revenue
+          type: decimal(12,2)
+          description: Gross revenue from orders placed in the month, including tax.
+          constraints: ["non_negative"]
+
+  - id: commerce.Order.order_total_non_negative
+    name: order_total_non_negative
+    entity: Order
+    version: 1
+    description: |
+      Invariant — every fct_orders.order_total is non-negative. Refused
+      negative totals would indicate a data-loading bug, so this contract
+      is enforced as a row-level rule rather than an aggregation.
+    owner: finance@jaffle.example
+    tags: [orders, invariant, data-quality]
+    signature:
+      outputs:
+        - name: order_total
+          type: decimal(12,2)
+          constraints: ["non_negative"]
