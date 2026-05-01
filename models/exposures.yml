@@ -1,0 +1,32 @@
+version: 2
+
+exposures:
+  - name: exec_orders_dashboard
+    label: Exec Orders Dashboard
+    type: dashboard
+    maturity: high
+    url: https://looker.example.com/dashboards/jaffle-orders
+    description: >
+      Quarterly executive review of order volume, revenue, and customer
+      growth across regions. Powered by `fct_orders`.
+    depends_on:
+      - ref('fct_orders')
+      - ref('dim_customers')
+    owner:
+      name: Analytics Engineering
+      email: analytics@jaffle.example.com
+
+  - name: marketing_attribution_notebook
+    label: Marketing Attribution Notebook
+    type: notebook
+    maturity: medium
+    url: https://hex.example.com/jaffle/attribution
+    description: >
+      Attribution model linking signup to first order. Maintained by
+      Growth; recomputed weekly.
+    depends_on:
+      - ref('fct_orders')
+      - ref('stg_customers')
+    owner:
+      name: Growth Team
+      email: growth@jaffle.example.com

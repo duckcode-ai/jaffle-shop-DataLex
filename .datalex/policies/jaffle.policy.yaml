@@ -1,0 +1,59 @@
+# Custom org policy pack for the jaffle-shop demo. Inherits the
+# DataLex-shipped baseline at `datalex/standards/base.yaml` and adds a
+# few rules that reflect this team's specific conventions.
+#
+# Run locally:
+#   datalex policy-check models/marts/core/fct_orders.yml \
+#     --policy .datalex/policies/jaffle.policy.yaml --inherit
+#
+# CI also reads it via `datalex readiness-gate` (see
+# .github/workflows/datalex.yml).
+pack:
+  name: jaffle-shop-standards
+  version: 0.1.0
+  description: Naming + meta + contract conventions for the jaffle-shop dbt project.
+  extends: datalex/standards/base.yaml
+
+policies:
+  # Layer-aware naming so source / staging / marts stay readable.
+  - id: layer_naming_conventions
+    type: regex_per_layer
+    severity: warn
+    params:
+      patterns:
+        stg: "^stg_[a-z][a-z0-9_]*$"
+        fct: "^fct_[a-z][a-z0-9_]*$"
+        dim: "^dim_[a-z][a-z0-9_]*$"
+
+  # Marts must declare an owner + grain in meta — both are required by
+  # the dbt mesh consumer team.
+  - id: marts_require_owner_and_grain
+    type: required_meta_keys
+    severity: warn
+    params:
+      keys: [owner, grain]
+      selectors:
+        layer: fct
+
+  # PII columns must carry a classification (mirrors `customer_email`
+  # in the doc-blocks file).
+  - id: pii_columns_must_be_classified
+    type: required_meta_keys
+    severity: error
+    params:
+      keys: [classification]
+      selectors:
+        tag: pii
+
+  # Every fct_* model must enforce a dbt contract before it ships.
+  - id: marts_require_contract
+    type: require_contract
+    severity: warn
+    params:
+      selectors:
+        layer: fct
+
+  # And once it does, every column must declare a concrete data_type.
+  - id: marts_require_concrete_types
+    type: require_data_type_when_contracted
+    severity: error

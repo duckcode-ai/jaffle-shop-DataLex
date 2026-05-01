@@ -33,8 +33,12 @@ This repository shows the full onboarding flow:
 
 ```text
 .
+├── .datalex/
+│   └── policies/jaffle.policy.yaml      # Custom rule pack, extends base
+├── .github/workflows/datalex.yml         # CI: dbt build + readiness gate
 ├── DataLex/
 │   └── commerce/
+│       ├── _glossary.model.yaml          # Business glossary + bindings
 │       ├── Conceptual/commerce_concepts.diagram.yaml
 │       ├── Logical/commerce_logical.diagram.yaml
 │       ├── Physical/duckdb/commerce_physical.diagram.yaml
@@ -42,9 +46,14 @@ This repository shows the full onboarding flow:
 ├── Skills/
 │   └── *.md
 ├── models/
+│   ├── docs/_canonical.md                # {% docs %} blocks for round-trip
+│   ├── exposures.yml                     # Exposures with owner.email + maturity
 │   ├── staging/jaffle_shop/
 │   ├── marts/core/
+│   │   ├── _unit_tests.yml               # dbt 1.8+ unit test fixtures
+│   │   └── *.sql / *.yml
 │   └── semantic/
+├── snapshots/                            # SCD type-2 customer snapshot
 ├── seeds/
 ├── Dockerfile
 ├── docker-compose.yml
@@ -52,6 +61,45 @@ This repository shows the full onboarding flow:
 ├── profiles.yml
 └── datalex.yaml
 ```
+
+## What's new in this example
+
+This repo demonstrates the latest DataLex modeling moat features. Once
+you `make docker-up` (or `datalex serve`) you can click through each one
+in the UI:
+
+- **Doc-block round-trip** — `models/docs/_canonical.md` defines four
+  shared `{% docs %}` blocks. `stg_customers.yml` and `fct_orders.yml`
+  reference them via `{{ doc("...") }}`. Re-importing the dbt project
+  preserves every reference (no flattening), and AI proposals can no
+  longer overwrite a doc-block-bound description in YAML by mistake.
+- **Custom policy pack** — `.datalex/policies/jaffle.policy.yaml`
+  inherits `datalex/standards/base.yaml` and adds layer-aware naming
+  conventions, required `meta` keys for marts, a PII classification
+  rule, and contract enforcement. Open the **Policy Packs** drawer tab
+  in the UI to view or edit it.
+- **Snapshots / Exposures / Unit Tests** — `snapshots/snapshots.yml`,
+  `models/exposures.yml`, and `models/marts/core/_unit_tests.yml`
+  exercise the full round-trip plus the new readiness checks (exposure
+  owner email, unit-test description, freshness `loaded_at_field`).
+  Each has a dedicated drawer tab.
+- **Glossary bindings** — `DataLex/commerce/_glossary.model.yaml` and
+  the logical diagram now bind `Customer.customer_key`,
+  `Customer.customer_email`, and `Sales Order.order_total` to glossary
+  terms via `binding: { glossary_term, status }`. Try
+  `datalex emit catalog --target atlan|datahub|openmetadata --model
+  DataLex/commerce/_glossary.model.yaml --out ./out` to see the
+  catalog-import payload.
+- **CI readiness gate** — `.github/workflows/datalex.yml` runs
+  `actions/datalex-gate` on every PR. It posts a sticky comment with
+  red/yellow/green file counts, uploads SARIF to the Security tab, and
+  fails the build when the project score drops below 70 (today's
+  baseline is ~78). Run it locally with `make readiness-gate`.
+- **AI agents** — open the entity inspector in the empty state and try
+  *Conceptualize from staging* and *Canonicalize from staging*. The
+  first proposes business entities + relationships from the four
+  staging models; the second lifts recurring columns into a logical
+  canonical layer with shared doc-block references.
 
 ## Quick Start
 
@@ -93,7 +141,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -U 'datalex-cli[serve,duckdb]>=1.8.2'
-datalex --version
+datalex --version    # 1.8.2+
 ```
 
 Build the local DuckDB warehouse:
@@ -116,6 +164,23 @@ Or from outside the repo:
 ```bash
 datalex serve --project-dir /Users/Kranthi_1/DuckCode-DQL/jaffle-shop-DataLex
 ```
+
+### When the app opens — the Onboarding Journey (1.4.1)
+
+A six-step right-rail panel walks you through the demo end to end:
+
+| # | Step | What to do here |
+|---|---|---|
+| 1 | **Welcome** | Click *Let's go* — two-line value prop |
+| 2 | **Connect your project** | Pick **Local folder** and paste this repo's absolute path. Tick **Edit in place** so saves write back to the same YAML files. |
+| 3 | **See what's missing** | The Validation drawer opens. Click any red file (e.g. `models/marts/core/fct_orders.yml`) to see readiness gaps — exactly what `datalex readiness-gate` enforces in CI. |
+| 4 | **Design your first business domain** | Click `+` to add a logical entity. The repo already ships `DataLex/commerce/` with conceptual + logical + physical layers as a reference. |
+| 5 | **Add your AI provider** | Settings → AI: paste an OpenAI / Anthropic key (or pick the local provider). The Conceptualizer + Canonicalizer agents work without an API key when set to `local`. |
+| 6 | **Ask AI to draw a diagram** | One click runs the **Conceptualizer** against the staging models — it'll propose entities like `Customer`, `Order`, `OrderItem`, `Product`, `Store`, `Supply` with FK relationships. Review and apply through the AI proposal preview. |
+
+Progress saves automatically. Replay anytime via **Settings → Replay
+onboarding**; the legacy 13-step spotlight tour is under **Settings →
+Deep feature tour**.
 
 ### Option B: Docker
 
