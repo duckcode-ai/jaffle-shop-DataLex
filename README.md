@@ -92,7 +92,7 @@ Equivalent manual setup:
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -U 'datalex-cli[serve,duckdb]>=1.3.7'
+pip install -U 'datalex-cli[serve,duckdb]>=1.8.2'
 datalex --version
 ```
 
@@ -151,7 +151,7 @@ docker run --rm -p 3030:3030 -v "$PWD":/workspace jaffle-shop-datalex:local
 To build against a specific released DataLex version:
 
 ```bash
-docker build --build-arg DATALEX_VERSION=1.3.7 -t jaffle-shop-datalex:local .
+docker build --build-arg DATALEX_VERSION=1.8.2 -t jaffle-shop-datalex:local .
 ```
 
 ## DataLex Flow

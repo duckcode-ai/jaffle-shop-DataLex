@@ -1,0 +1,138 @@
+kind: diagram
+name: commerce_eventstorming
+title: Jaffle Shop — EventStorming flow for Order
+layer: conceptual
+domain: commerce
+description: >-
+  EventStorming view of the Order lifecycle. Tells the same story as the
+  ER diagram (commerce_concepts) but in workshop-readable shape: who
+  does what, what happened, and which rules react. Open this file with
+  DataLex 1.8.2+ to see the canvas sticky-note palette and the
+  numbered "EventStorming flow" narrative in DocsView.
+entities:
+  - name: Customer
+    type: actor
+    domain: commerce
+    owner: Customer Experience
+    description: Person who orders a jaffle. Initiates the flow.
+    x: 0
+    'y': 0
+    width: 220
+
+  - name: PlaceOrder
+    type: command
+    domain: commerce
+    owner: Store Operations
+    description: Customer's intent to buy — a basket of items + payment details.
+    x: 280
+    'y': 0
+    width: 260
+
+  - name: Order
+    type: aggregate
+    domain: commerce
+    owner: Store Operations
+    description: Consistency boundary holding the order's items, status, and totals while the command is handled.
+    x: 600
+    'y': 0
+    width: 240
+
+  - name: OrderPlaced
+    type: event
+    domain: commerce
+    owner: Store Operations
+    description: An order was recorded against the customer (past tense fact).
+    x: 600
+    'y': 200
+    width: 240
+
+  - name: PaymentReceived
+    type: event
+    domain: commerce
+    owner: Finance
+    description: Funds cleared for this order.
+    x: 880
+    'y': 200
+    width: 240
+
+  - name: SendOrderConfirmation
+    type: policy
+    domain: commerce
+    owner: Customer Experience
+    description: When OrderPlaced and PaymentReceived have both fired, dispatch the confirmation email and trigger fulfillment.
+    x: 740
+    'y': 380
+    width: 280
+
+relationships:
+  - name: customer_issues_place_order
+    from:
+      entity: Customer
+      field: ''
+    to:
+      entity: PlaceOrder
+      field: ''
+    cardinality: one_to_many
+    description: Customers issue PlaceOrder commands when they check out.
+    verb: issues
+    relationship_type: event
+
+  - name: place_order_handled_by_order
+    from:
+      entity: PlaceOrder
+      field: ''
+    to:
+      entity: Order
+      field: ''
+    cardinality: many_to_one
+    description: The Order aggregate handles PlaceOrder and decides whether it succeeds.
+    verb: handled by
+    relationship_type: dependency
+
+  - name: order_emits_order_placed
+    from:
+      entity: Order
+      field: ''
+    to:
+      entity: OrderPlaced
+      field: ''
+    cardinality: one_to_many
+    description: A successful PlaceOrder produces an OrderPlaced event.
+    verb: emits
+    relationship_type: event
+
+  - name: order_emits_payment_received
+    from:
+      entity: Order
+      field: ''
+    to:
+      entity: PaymentReceived
+      field: ''
+    cardinality: one_to_many
+    description: When the payment processor reports a clear, the aggregate emits PaymentReceived.
+    verb: emits
+    relationship_type: event
+
+  - name: order_placed_triggers_policy
+    from:
+      entity: OrderPlaced
+      field: ''
+    to:
+      entity: SendOrderConfirmation
+      field: ''
+    cardinality: one_to_many
+    description: OrderPlaced wakes the SendOrderConfirmation policy.
+    verb: triggers
+    relationship_type: event
+
+  - name: payment_received_triggers_policy
+    from:
+      entity: PaymentReceived
+      field: ''
+    to:
+      entity: SendOrderConfirmation
+      field: ''
+    cardinality: one_to_many
+    description: PaymentReceived also feeds the SendOrderConfirmation policy; both events must arrive before it fires.
+    verb: triggers
+    relationship_type: event

@@ -11,7 +11,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 python3-venv python3-pip ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
-ARG DATALEX_VERSION=1.3.7
+ARG DATALEX_VERSION=1.8.2
 
 COPY requirements.txt ./
 RUN python3 -m venv /opt/venv \
